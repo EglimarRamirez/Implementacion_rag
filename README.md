@@ -1,91 +1,104 @@
-# Implementacion_rag
-proyecto de asistente tributario municipal basado en rag
+# 🏛️ Asistente Inteligente de Orientación Tributaria Municipal  
+### Basado en RAG + Cohere + ChromaDB
 
-🏛️ Asistente Inteligente para Orientación Tributaria Municipal
-Basado en RAG + Cohere + ChromaDB
-💡 Contexto y Problema
+---
 
-Durante la experiencia con usuarios reales del municipio se identificaron dolores críticos:
+## 📌 Contexto y Problema
 
-Contribuyentes realizan pagos y no aparecen imputados.
+Durante el análisis de la experiencia real de contribuyentes municipales se identificaron problemas críticos:
 
-Personas pagan dos veces sin saber cómo reclamar.
+- Pagos realizados que no aparecen imputados
+- Personas que pagan dos veces el mismo impuesto sin saber cómo reclamar
+- Desconocimiento de trámites, requisitos y documentación
+- Información dispersa en documentos extensos y técnicos
+- Dependencia del canal presencial → largas filas, demoras y frustración
 
-Ciudadanos no entienden los trámites ni la normativa.
+🎯 **Los ciudadanos no necesitan normativa compleja. Necesitan respuestas claras, confiables y accionables.**
 
-Información está dispersa en documentos largos y técnicos.
+---
 
-Canal presencial saturado → largas filas, frustración, demoras.
+## 🎯 Objetivo del Proyecto
 
-Los vecinos no necesitan teoría.
-Necesitan respuestas claras, confiables y accionables.
+Construir un **Asistente Inteligente Tributario Municipal** capaz de:
 
-🎯 Objetivo del Proyecto
+✔️ Entender consultas en lenguaje natural  
+✔️ Buscar información en normativa oficial y guías reales  
+✔️ Responder únicamente si existe información documentada  
+✔️ Evitar inventar contenido  
+✔️ Orientar operativamente qué hacer y cómo hacerlo  
 
-Construir un Asistente Inteligente de Orientación Tributaria Municipal capaz de:
+---
 
-✔️ Entender consultas naturales de ciudadanos
-✔️ Buscar en normativa oficial y guías reales
-✔️ Responder solo si la información existe
-✔️ Evitar inventar respuestas
-✔️ Guiar operativamente qué hacer y cómo hacerlo
+## 🧠 Arquitectura General
 
-🧠 Arquitectura General
-PDFs oficiales → Limpieza → Chunking Inteligente
-→ Embeddings Cohere → Base Vectorial Chroma Persistente
-→ Query del Usuario
-→ Recuperación con Grounding
-→ Respuesta Segura y Contextual
+Documentos PDF municipales
+↓
+Limpieza + Chunking Inteligente
+↓
+Embeddings Cohere
+↓
+ChromaDB Persistente
+↓
+Consulta del Usuario
+↓
+Recuperación + Grounding
+↓
+Respuesta Segura y Contextual
 
-⚙️ Pipeline Técnico RAG
-1️⃣ Ingesta de Documentos
 
-Carga vía endpoint /upload-file
+---
 
-Extracción de texto
+## ⚙️ Pipeline Técnico RAG
 
-Almacenamiento en memoria + persistencia Chroma
+### 1️⃣ Ingesta de Documentos
+- Carga mediante endpoint `/upload-file`
+- Extracción de texto
+- Almacenamiento temporal + persistencia en ChromaDB
 
-2️⃣ Chunking Inteligente
+---
 
-Se aplican estrategias distintas según el tipo de documento:
+### 2️⃣ Chunking Inteligente
+Se aplicaron estrategias dependientes del tipo de documento:
 
-Tipo de Documento	Estrategia
-Normativa (Código Tributario)	Chunks grandes para mantener coherencia legal
-Guías / Trámites	Chunks medianos, orientados a pasos
-Protocolos / Notas	Chunks pequeños y precisos
-3️⃣ Metadatos aplicados
+| Tipo documento | Estrategia |
+|----------------|----------|
+| Normativa | Chunks grandes (mantener coherencia legal) |
+| Protocolos y notas | Chunks pequeños y precisos |
 
-Cada chunk se almacena con:
+---
 
-document_id
+### 3️⃣ Metadatos Aplicados
 
-title
+Cada chunk almacena:
 
-tipo_documento
+- `document_id`
+- `title`
+- `tipo_documento`
+- `tramite`
+- `chunk_index`
 
-tramite
+Permite:
 
-chunk_index
-
-📌 Esto permite:
-✔️ Filtrar relevancia
-✔️ Garantizar consistencia de contexto
-✔️ Aplicar reglas de dominio
+✔️ Filtrar relevancia  
+✔️ Asegurar consistencia  
+✔️ Aplicar reglas de dominio  
 ✔️ Mejorar grounding
 
-4️⃣ Embeddings Cohere
+---
 
-Modelo usado:
-embed-multilingual-v3.0
+### 4️⃣ Embeddings Cohere
+Modelo utilizado: embed-multilingual-v3.0
 
-Se implementó:
 
-Batch embedding
-Para evitar límite de 96 embeddings por request.
+Incluye:
 
-5️⃣ Base Vectorial Persistente
+- Batch embeddings
+- Manejo de límite de requests
+- Compatibilidad multilenguaje
 
+---
+
+### 5️⃣ Base Vectorial Persistente
 Se usa:
 
 Chroma Persistent Client
@@ -93,99 +106,205 @@ Chroma Persistent Client
 
 Beneficios:
 
-✔️ No se pierde info al reiniciar API
-✔️ Base local segura
-✔️ Consulta rápida
+✔️ Persistencia local  
+✔️ No se pierde información  
+✔️ Alta velocidad de consulta  
 
-6️⃣ Recuperación y Grounding Inteligente
+---
 
-Se obtienen top-k resultados y se valida:
+### 6️⃣ Recuperación + Grounding Inteligente
 
-✔️ best similarity score
-✔️ promedio de similitud
-✔️ consistencia por tipo de documento
-✔️ consistencia por trámite
+Se recuperan `Top-K` chunks y se valida:
+
+✔️ Mejor score  
+✔️ Promedio de similitud  
+✔️ Consistencia temática  
+✔️ Validación por metadatos  
 
 Si NO hay evidencia suficiente:
 
-🔒 El sistema NO responde inventando.
-Responde seguro:
+> "No cuento con información suficiente para responder con certeza este caso."
 
-“No cuento con información suficiente para responder con certeza este caso.”
+Nunca inventa normativa.
 
-🧾 Base de Conocimiento
+---
 
-1️⃣ Código Tributario Municipal – 144 páginas
-2️⃣ Guía de trámites, reclamos y consultas
-3️⃣ Protocolo Art. 25 – Nota Formal
-4️⃣ Autoridad Operativa / Representación
-5️⃣ Requisitos Plan de Pago y Regularización
+## 🧾 Base de Conocimiento
 
-🤖 Prompt Engineering
+1️⃣ Código Tributario Municipal  
+2️⃣ Guía de Trámites, Reclamos y Consultas  
+3️⃣ Protocolo Nota Formal (Artículo 25)  
+4️⃣ Autoridad Operativa / Representación  
+5️⃣ Requisitos Plan de Pago y Regularización  
 
-El modelo:
+---
 
-habla en español
+## 🤖 Prompt Engineering
 
-respuesta clara, administrativa
+El asistente:
 
-NO agrega leyes fuera del contexto
+- Responde en español claro
+- No refiere normativa externa no disponible
+- Diferencia:
+  - Reclamos
+  - Consultas
+  - Planes de pago
+- Solo usa información existente en documentos
 
-diferencia entre:
+---
 
-reclamos
+## 🧪 Casos de Uso Cubiertos
 
-plan de pago
+✔️ Falta de imputación de pago  
+✔️ Pago duplicado  
+✔️ Emisión y consulta de cedulones  
+✔️ Solicitud de plan de pago  
+✔️ Presentación de nota formal  
+✔️ Consultas generales  
 
-consultas
+---
 
-respeta contenido exacto del PDF
+## 🚫 Seguridad Semántica
 
-🧪 Casos de Uso Cubiertos
+- No responde sin grounding
+- No inventa normativa
+- No extrapola información
+- Informa cuando falta evidencia
 
-✔️ Falta de imputación de pago
-✔️ Pago duplicado
-✔️ Emisión de Cedulones
-✔️ Solicitud de Plan de Pago
-✔️ Protocolo Art. 25
-✔️ Consultas generales
+---
 
-🚫 Seguridad Semántica
-
-No responde sin grounding
-
-No inventa normativa
-
-No extrapola contexto
-
-Detecta cuando falta información
-
-🔍 Logging Profesional
+## 🔍 Logging Profesional
 
 Implementado para:
 
-Debugging
+- Auditoría
+- Debugging
+- Monitoreo del pipeline RAG
 
-Auditoría
+---
 
-Monitoreo de RAG Pipeline
+## 🚧 Limitaciones
 
-🚧 Limitaciones
+- Base de conocimiento limitada a documentos cargados
+- No accede a sistemas reales municipales
+- No valida identidad del usuario
 
-Base limitada a documentos cargados
+---
 
-No consulta bases reales municipales
+## ➕ Futuras Mejoras
 
-No valida identidad real del usuario
+- Frontend ciudadano productivo
+- Incorporar resoluciones adicionales
+- Analítica de consultas
+- Integración con sistemas municipales reales
+- Flujo conversacional guiado
+- Seguimiento de ticket y estado de trámite
 
-➕ Futuras Mejoras
+---
 
-Frontend ciudadano
+# 🛠️ Instalación y Ejecución
 
-Más fuentes (boletines, resoluciones, FAQs)
+## ✅ Requisitos
 
-Analítica de consultas ciudadanas
+- Python 3.10+
+- Cohere API Key
+- Internet
+- Pip
+- Git
 
-Integración con sistemas municipales reales
+---
 
-Seguimiento de tickets
+## 📥 Clonar Repositorio
+
+```bash
+git clone <repo>
+cd Asistente_Tributario_Municipal_RAG
+```
+
+
+---
+
+## 🧩 Crear entorno e instalar dependencias
+
+```bash
+python -m venv venv
+# Linux / macOS
+source venv/bin/activate
+# Windows (PowerShell)
+venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+
+---
+
+## 🔑 Configurar COHERE API
+Crear archivo `.env` o variable de entorno:
+
+```bash
+# Ejemplo .env o variable de entorno
+COHERE_API_KEY="tu_api_key_aqui"
+```
+
+
+---
+
+## 🚀 Ejecutar Backend
+
+```bash
+uvicorn main:app --reload
+```
+
+
+Swagger disponible en:
+
+http://localhost:8000/docs
+
+
+---
+
+## 💬 Ejecutar Frontend (Streamlit)
+```bash
+streamlit run app_streamlit.py
+```
+
+
+---
+
+## 📡 Persistencia ChromaDB
+Si no existe carpeta `chroma_db`, se generará automáticamente cuando se creen embeddings.
+
+Si desea crearla manualmente:
+
+```bash
+# Linux / macOS
+mkdir -p chroma_db
+# Windows (PowerShell / CMD)
+mkdir chroma_db
+```
+
+Se generará automáticamente cuando se creen embeddings.
+
+---
+
+## 🎯 Demo Sugerida
+1️⃣ Caso simple: pago duplicado  
+2️⃣ Caso intermedio: falta imputación  
+3️⃣ Caso sobre titularidad  
+4️⃣ Caso fuera de alcance  
+
+(archivo `casos_de_prueba.txt` incluido)
+
+---
+
+## 🏁 Estado del Proyecto
+✔️ Operativo  
+✔️ Probado  
+✔️ Enfocado en ciudadanía  
+✔️ Listo para demo y evaluación  
+
+---
+
+## 👩‍💻 Autor
+**Eglimar Ramirez**  
+Proyecto desarrollado para Get Talent Challenge - IA Aplicada a la Administración Pública.
