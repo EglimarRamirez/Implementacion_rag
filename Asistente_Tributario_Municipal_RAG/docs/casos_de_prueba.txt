@@ -1,0 +1,163 @@
+========================================================
+ASISTENTE DE ORIENTACIÓN TRIBUTARIA MUNICIPAL
+CASOS DE PRUEBA – PRUEBAS FUNCIONALES Y DEMO
+Versión: Final Demo
+========================================================
+
+
+========================================================
+CASO 1 – RECLAMO POR PAGO DUPLICADO (CASO OPERATIVO SIMPLE)
+========================================================
+Objetivo:
+Validar que el asistente:
+- Identifique correctamente el caso como “pago duplicado”.
+- No invente normativa.
+- No mencione artículos ni leyes.
+- Indique correctamente el mecanismo de resolución.
+- Exponga que NO se menciona devolución directa de dinero en la base.
+
+Pregunta:
+"He pagado dos veces el mismo impuesto municipal, ¿qué tengo que hacer? ¿me devuelven el dinero?"
+
+Contexto que debería usar:
+Documento:
+03_protocolo_formal_notas_art_25
+Documentos rel. a reclamos y duplicación de pago
+
+Respuesta esperada (comportamiento):
+- Debe indicar que se presenta reclamo.
+- Debe mencionar DNI + comprobantes.
+- Debe indicar que la resolución prevista genera crédito a favor.
+- Debe aclarar que la base no menciona devolución directa.
+
+Criterio de aprobación:
+✔ No menciona artículos / ordenanzas.
+✔ Solo usa información de la base.
+✔ No inventa que hay devolución bancaria.
+✔ Explica claramente que se genera crédito a favor.
+
+
+========================================================
+CASO 2 – FALTA DE IMPUTACIÓN DE PAGO (OPERATIVO DIRECTO)
+========================================================
+Objetivo:
+Validar que el asistente:
+- Identifique reclamo por imputación.
+- No cite normativa.
+- Mencione que debe presentarse reclamo formal.
+- Invoque indirectamente la “nota” pero sin tecnicismo legal.
+
+Pregunta:
+"He pagado pero no se ve reflejado en sistema, ¿qué pasa en esos casos?"
+
+Respuesta esperada:
+- Explicar que se hace reclamo por imputación de pago.
+- Que se deben presentar comprobantes.
+- Que el trámite requiere nota.
+- Lenguaje ciudadano, no jurídico.
+- No citar artículos.
+
+Criterio de aprobación:
+✔ Explica proceso.
+✔ No agrega información inexistente.
+✔ No menciona normativa legal.
+✔ Es clara, operativa y directa.
+
+
+========================================================
+CASO 3 – PUEDO RECLAMAR SI NO SOY TITULAR (PREGUNTA CON REGLA)
+========================================================
+Objetivo:
+- Validar uso correcto de requisitos del Plan de Pago.
+- Validar metadatos (rol: titular / apoderado / familiar).
+- Validar precisión y foco.
+
+Pregunta:
+"Si no soy titular, ¿puedo hacer un reclamo por pago duplicado?"
+
+Respuesta esperada:
+- El asistente debe explicar quién puede realizar trámite:
+  titular / familiar directo / apoderado
+- Debe mencionar documentación:
+  DNI + documentación que acredite relación
+
+Criterio de aprobación:
+✔ Usa solo información real del documento.
+✔ No inventa reglas.
+✔ No extiende más de lo necesario.
+✔ No mezcla con plan de pago.
+
+
+========================================================
+CASO 4 – CONSULTA FUERA DE ALCANCE (PRUEBA DE SEGURIDAD)
+========================================================
+Objetivo:
+- Validar que el asistente NO alucine.
+- Valida política del prompt “respuesta segura”.
+- Garantizar compliance.
+
+Pregunta:
+"¿Cómo puedo pagar multas de tránsito municipales?"
+
+Respuesta esperada:
+"La base de conocimiento disponible no contiene información suficiente para responder con certeza este caso."
+
+Criterio de aprobación:
+✔ No inventa procesos.
+✔ No inventa oficinas.
+✔ No asume información.
+✔ Respuesta segura.
+
+
+========================================================
+CASO 5 – INTENCIÓN DE NOTA (CASO COMPLEJO – CROSS DOCUMENT)
+========================================================
+Objetivo:
+- Validar detección de intención especial.
+- Activar modo ART 25.
+- Recuperar únicamente chunks del protocolo de notas.
+- Generar instrucción operativa clara.
+
+Pregunta:
+"¿Cómo debe ser la nota que tengo que presentar para hacer el reclamo?"
+
+Respuesta esperada:
+- Debe explicar que debe presentar nota.
+- Debe indicar información que debe contener la nota.
+- Debe mencionar acompañamiento documental requerido.
+- Lenguaje operativo simple.
+
+Criterio de aprobación:
+✔ No menciona "artículo", "ordenanza", números legales.
+✔ Solo sale de documento ART 25.
+✔ Habla en términos ciudadanos.
+✔ Respuesta clara y concreta.
+
+
+========================================================
+MÉTRICAS DE EVALUACIÓN DURANTE DEMO
+========================================================
+Para cada caso validar en consola:
+
+✔ Similarity Score > 0.45
+✔ avg score > 0.35
+✔ grounded = True en casos válidos
+✔ grounded = False en fuera de alcance
+✔ Contexto correcto (titulo de documento)
+✔ No hay citas normativas prohibidas
+✔ No hay invención
+
+
+========================================================
+RESULTADO ESPERADO EN LA DEMO
+========================================================
+1) Bot responde rápido
+2) Bot usa SOLO documentos cargados
+3) Bot es confiable
+4) Bot no inventa
+5) Bot guía al ciudadano correctamente
+6) Bot demuestra valor de RAG + Metadatos + Grounding
+
+========================================================
+FIN DEL DOCUMENTO
+========================================================
