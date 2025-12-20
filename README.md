@@ -208,9 +208,9 @@ Implementado para:
 
 - Python 3.10+
 - Cohere API Key
-- Internet
-- Pip
-- Git
+- fastapi
+- Chromadb
+- langchain
 
 ---
 
